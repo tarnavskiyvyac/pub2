@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/my_app
+    parallelism: 1
+    resource_class: medium
+    steps:
+      # Docker is preinstalled, along with docker-compose
+      - checkout
+
+      # start proprietary DB using private Docker image
+      - run: |
+          docker run --privileged tablet01/hw01
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0,5,10,15,20 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
